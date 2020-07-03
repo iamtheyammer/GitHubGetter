@@ -9,13 +9,36 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var state: AppState
+    
     var body: some View {
-        Text("Hello, World!")
+        VStack(alignment: .leading) {
+            HStack {
+                Text("GitHub Getter")
+                    .font(.title)
+                    .padding([.horizontal, .top])
+                Spacer()
+            }
+            HStack {
+                TextField("Enter a GitHub username", text: $state.login)
+                    .padding([.horizontal])
+                Button(action: state.getProfile) {
+                Text("Get profile")
+                    .padding([.horizontal])
+                }
+            }
+            .padding([.bottom])
+            if state.profile != nil {
+                ProfileView(profile: state.profile!)
+            }
+            Spacer()
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+        .environmentObject(AppState())
     }
 }
