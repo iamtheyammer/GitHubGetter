@@ -59,20 +59,30 @@ final class AppState: ObservableObject {
         let baseURL = URL(string: "https://api.github.com/users/" + login)!
         
         let task = URLSession.shared.dataTask(with: baseURL) { (data, response, error) in
-            if error != nil {
-                print("There was an error: ", error!)
+            if let error = error {
+                print("There was an error: ", error)
                 
                 DispatchQueue.main.async {
-                    self.error = error.debugDescription
+                    self.error = error.localizedDescription
                 }
+                return
             }
             
-            if let data = data {                
+            if let data = data, let response = response as? HTTPURLResponse {
                 let rawJSON = try? JSONSerialization.jsonObject(with: data)
                 let json = rawJSON as? [String: Any]
                 
                 DispatchQueue.main.async {
+                    if response.statusCode != 200 {
+                        if let msg = json!["message"] {
+                            self.error = "There was an error getting the profile: \(msg)"
+                            self.profile = nil
+                            return
+                        }
+                    }
+                    
                     self.profile = GitHubProfile.init(json: json!)
+                    self.error = ""
                 }
                 
             }

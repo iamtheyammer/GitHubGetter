@@ -31,6 +31,12 @@ struct ContentView: View {
             if state.profile != nil {
                 ProfileView(profile: state.profile!)
             }
+            
+            if state.error.count > 0 {
+                Text(state.error)
+                    .foregroundColor(Color.red)
+                    .padding([.horizontal])
+            }
             Spacer()
         }
     }
